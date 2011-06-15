@@ -132,7 +132,7 @@ def draw(font_string,font_size,lang,alphabets): # language, font file name, font
      
        
        
-    bigimage.save(image_dir+"/"+"bigimage.tif","TIFF")
+    bigimage.save(image_dir+"/"+"bigimage.tif","TIFF", dpi=(600,600))
     f.close()
        
            
