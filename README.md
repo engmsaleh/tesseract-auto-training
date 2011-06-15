@@ -26,11 +26,9 @@ REQUIREMENTS
 USAGE
 -----
 
-python generate.py -font <font name> -l <language> -s <size> -a <input alphabet directory>
+`python generate.py -font <font name> -l <language> -s <size> -a <input alphabet directory>`
 
-Example:
-```shell
-   generate.py -font mitra -l beng -s 10 -a beng.alphabet/
-   generate.py -font Courier -l eng -s 10 -a eng.alphabet/
-   generate.py -font Arial -l slk -s 10 -a slk.alphabet/
-```
+**Example:**
+        generate.py -font mitra -l beng -s 10 -a beng.alphabet/
+        generate.py -font Courier -l eng -s 10 -a eng.alphabet/
+        generate.py -font Arial -l slk -s 10 -a slk.alphabet/

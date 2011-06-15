@@ -6,7 +6,15 @@ import string
 import shutil
 import glob
 import time
-    
+import subprocess
+
+def find_tesseract():
+    """Find best version of tesseract"""
+    # TODO
+    highest_version = '/usr/local/bin/tesseract '
+    return highest_version
+
+
 def weedout(img_file_name,image_folder):  
     """ Move the corresponding erroneous image/box-file pair to a faulty directory"""
     if(os.path.exists("failure")):
@@ -40,6 +48,7 @@ def move_file(lang, filename):
 
 def train(lang, filename):
     """Generates normproto, inttemp, Microfeat, unicharset and pffmtable"""
+    # TODO: check for errors e.g. no output files...
     output_dir = lang + "." + "training_data"
     dir = lang + "." + "images" + "/"
     
@@ -51,19 +60,28 @@ def train(lang, filename):
     print "in train"
     image = filename + '.tif'
     box = filename + '.box'
-    exec_string1='tesseract ' + dir + image + ' ' + filename + ' nobatch box.train.stderr'
+
+    tesseract_cmd = find_tesseract()
+    exec_string1=tesseract_cmd + dir + image + ' ' + filename + ' nobatch box.train.stderr'
     print exec_string1
-    qpipe = os.popen4(exec_string1) # This returns a list.  The second list element is a file object from which you can read the command output.
-    # this creates files: slk.Arial.exp15.tr, slk.Arial.exp15.txt
-    o=qpipe[1].readlines() 
-    pos=str(o).find('FAILURE') #Look for the word "FAILURE" in tesseract-ocr trainer output.
+
+    qpipe1 = subprocess.Popen(exec_string1, shell=True, stdin=subprocess.PIPE, \
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+    # This creates files: slk.Arial.exp15.tr, slk.Arial.exp15.txt
+    
+    #Look for the word "FAILURE" in tesseract-ocr trainer output.
+    #qpipe = os.popen4(exec_string1) 
+    # This returns a list.  The second list element is a file object from which you can read the command output.
+    #o=qpipe[1].readlines() 
+    #pos=str(o).find('FAILURE')
     #print str(o)
 
     # Compute the Character Set
     exec_string2="unicharset_extractor"
     for name in glob.glob(dir + '/*.box'):
         exec_string2 += " " + name  
-    qpipe4 = os.popen4(exec_string2)
+    qpipe2 = subprocess.Popen(exec_string2, shell=True, stdin=subprocess.PIPE, \
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
     # this creates files: unicharset
     print exec_string2
 
@@ -79,13 +97,16 @@ def train(lang, filename):
     exec_string4="cntraining " + tr_string
 
     print exec_string3
-    qpipe2=os.popen4(exec_string3)
+    qpipe3 = subprocess.Popen(exec_string3, shell=True, stdin=subprocess.PIPE, \
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
     # this creates files: inttemp, mfunicharset, pffmtable, Microfeat
+    print qpipe3
     print exec_string4
-    qpipe3=os.popen4(exec_string4)
+    qpipe4 = subprocess.Popen(exec_string4, shell=True, stdin=subprocess.PIPE, \
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
     # this creates files: normproto
 
-    #Now rename the 5 training files so it can be readily used with tesseract
+    # Now rename the 5 training files so it can be readily used with tesseract
     move_file(lang, "unicharset")
     move_file(lang, "inttemp")
     move_file(lang, "mfunicharset")
@@ -93,13 +114,17 @@ def train(lang, filename):
     move_file(lang, "Microfeat")
     move_file(lang, "normproto")
 
-    #Putting it all together
+    # TODO: dictionary    
+    # TODO: create lang.config with version info ;-)
+
+    # Putting it all together
     exec_string5= "combine_tessdata " + lang + ".training_data/" + lang +"."
     print exec_string5
-    qpipe3=os.popen4(exec_string5)
-
-    # TODO: dictionary
+    qpipe5 = subprocess.Popen(exec_string5, shell=True, stdin=subprocess.PIPE, \
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
  
     # Cleaning...
-    os.remove(filename + ".txt")
-    os.remove(filename + ".tr")
+    if os.path.exists(filename + ".txt"):
+        os.remove(filename + ".txt")
+    if os.path.exists(filename + ".tr"):
+        os.remove(filename + ".tr")
