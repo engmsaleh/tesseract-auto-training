@@ -15,11 +15,10 @@ This is attempt to create python scripts for automatic tesseract traning.
 Scripts are based on script from project [tesseractindic tesseract_trainer](http://code.google.com/p/tesseractindic/source/browse/#svn/trunk/tesseract_trainer)
 
 
-
 REQUIREMENTS
 -----------
 
-* Python (tested on 2.6)
+* Python (tested on 2.6.6)
 * tesseract (tested on 3.00)
 
 
@@ -29,6 +28,6 @@ USAGE
 `python generate.py -font <font name> -l <language> -s <size> -a <input alphabet directory>`
 
 **Example:**
-        generate.py -font mitra -l beng -s 10 -a beng.alphabet/
-        generate.py -font Courier -l eng -s 10 -a eng.alphabet/
-        generate.py -font Arial -l slk -s 10 -a slk.alphabet/
+	`generate.py -font mitra -l beng -s 10 -a beng.alphabet/`
+	`generate.py -font Courier -l eng -s 10 -a eng.alphabet/`
+	`generate.py -font Arial -l slk -s 10 -a slk.alphabet/`

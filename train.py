@@ -11,7 +11,7 @@ import subprocess
 def find_tesseract():
     """Find best version of tesseract"""
     # TODO
-    highest_version = '/usr/local/bin/tesseract '
+    highest_version = 'tesseract '
     return highest_version
 
 
@@ -66,7 +66,7 @@ def train(lang, filename):
     print exec_string1
 
     qpipe1 = subprocess.Popen(exec_string1, shell=True, stdin=subprocess.PIPE, \
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     # This creates files: slk.Arial.exp15.tr, slk.Arial.exp15.txt
     
     #Look for the word "FAILURE" in tesseract-ocr trainer output.
@@ -81,7 +81,7 @@ def train(lang, filename):
     for name in glob.glob(dir + '/*.box'):
         exec_string2 += " " + name  
     qpipe2 = subprocess.Popen(exec_string2, shell=True, stdin=subprocess.PIPE, \
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     # this creates files: unicharset
     print exec_string2
 
@@ -98,12 +98,12 @@ def train(lang, filename):
 
     print exec_string3
     qpipe3 = subprocess.Popen(exec_string3, shell=True, stdin=subprocess.PIPE, \
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     # this creates files: inttemp, mfunicharset, pffmtable, Microfeat
-    print qpipe3
+
     print exec_string4
     qpipe4 = subprocess.Popen(exec_string4, shell=True, stdin=subprocess.PIPE, \
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     # this creates files: normproto
 
     # Now rename the 5 training files so it can be readily used with tesseract
@@ -121,7 +121,7 @@ def train(lang, filename):
     exec_string5= "combine_tessdata " + lang + ".training_data/" + lang +"."
     print exec_string5
     qpipe5 = subprocess.Popen(exec_string5, shell=True, stdin=subprocess.PIPE, \
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
  
     # Cleaning...
     if os.path.exists(filename + ".txt"):
