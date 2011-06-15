@@ -19,7 +19,7 @@ REQUIREMENTS
 -----------
 
 * Python (tested on 2.6.6)
-* tesseract (tested on 3.00)
+* tesseract (tested on 3.00; at the moment it do not work with 3.01)
 
 
 USAGE
@@ -28,6 +28,7 @@ USAGE
 `python generate.py -font <font name> -l <language> -s <size> -a <input alphabet directory>`
 
 **Example:**
-	`generate.py -font mitra -l beng -s 10 -a beng.alphabet/`
-	`generate.py -font Courier -l eng -s 10 -a eng.alphabet/`
-	`generate.py -font Arial -l slk -s 10 -a slk.alphabet/`
+
+    `python generate.py -font mitra -l beng -s 10 -a beng.alphabet/`
+    `python generate.py -font Courier -l eng -s 10 -a eng.alphabet/`
+    `python generate.py -font Arial -l slk -s 10 -a slk.alphabet/`
