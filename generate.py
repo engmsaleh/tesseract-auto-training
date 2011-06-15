@@ -1,5 +1,6 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 #-*- coding:utf8 -*-
+
 #This code generates the training files for tesseract-ocr for bootstrapping a new character set
 import file
 import distort
@@ -16,9 +17,7 @@ import pangocairo
 import ImageFont, ImageDraw, ImageChops
 from PIL import Image
 
-
 bigbox=()
-
 
 def expand(temp_bbox):
     """expand a bounding box a little bit"""
@@ -27,25 +26,24 @@ def expand(temp_bbox):
     return bbox
 
 
-def draw(font_string,font_size,lang,alphabets): # language, font file name, font full path, font size, characters
+def draw(font_name, font_size, lang, alphabets):
     """ Generates tif images and box files"""
-    
+    font_string = font_name + ' ' + str(font_size)
     
     image_dir=lang+"."+"images"
     if(os.path.exists(image_dir)):
         pass
     else:
         os.mkdir(image_dir)
-       
-    #Using a font
-    #font= ImageFont.truetype(font,fsz)
-    boxfile=image_dir+"/"+"bigimage.box"
-    f=open(boxfile,"w")
-     
+
+    boxfile = image_dir + "/" + lang + "." + font_name + ".exp%2d.box" % (font_size)
+    f = open(boxfile, "w")
+    
     bigimage=Image.new("L",(2000,2000),255)
     bigdraw=ImageDraw.Draw(bigimage)
     x=y=10
     count=0
+        
     for akshar in alphabets:
         akshar.strip() #remove nasty characters
        
@@ -65,7 +63,7 @@ def draw(font_string,font_size,lang,alphabets): # language, font file name, font
         layout = pc.create_layout()
         layout.set_font_description(pango.FontDescription(font_string))
         layout.set_text(akshar)
-        print akshar
+        #print akshar
 
         #  lines take care of centering the text.
         width, height = surface.get_width(), surface.get_height()
@@ -74,8 +72,8 @@ def draw(font_string,font_size,lang,alphabets): # language, font file name, font
         context.move_to(*position)
         pc.show_layout(layout)
         surface.write_to_png("pango.png")
-	#iter=layout.get_iter()
-	#print iter.get_char_extents()
+        #iter=layout.get_iter()
+        #print iter.get_char_extents()
 
         #Here we open the generated image using PIL functions
         temp_image=Image.open("pango.png") #black background, white text
@@ -84,22 +82,20 @@ def draw(font_string,font_size,lang,alphabets): # language, font file name, font
         deltax=bbox[2]-bbox[0]
         deltay=bbox[3]-bbox[1]
 
-       
-        print bbox
+        #print bbox
         new_image=temp_image.crop(bbox)
         temp_image=temp_image.load()
         inverted_image = ImageChops.invert(new_image) #White background, black text
-	
-	inverted_image.save(image_dir+"/"+str(count)+".png")
-	count=count+1
-	
+    
+        inverted_image.save(image_dir+"/"+str(count)+".png")
+        count=count+1
 
         bigimage.paste(inverted_image,(x,y))
-	#bigimage.load()
+        #bigimage.load()
         bigbox=(x,y,x+deltax,y+deltay)
-        print bigbox
+        #print bigbox
         draw=ImageDraw.Draw(bigimage)
-	#draw.rectangle(bigbox,None,100)
+        #draw.rectangle(bigbox,None,100)
         x=bigbox[2]+5
         if x>1950:
             x=10; y=y+40
@@ -107,32 +103,29 @@ def draw(font_string,font_size,lang,alphabets): # language, font file name, font
         os.unlink("pango.png") #delete the pango generated png
 
         line=akshar+" "+str(bigbox[0]-1)+" "+str(2000-(bigbox[1]+deltay)-1)+" "+str(bigbox[2]+1)+" "+str(2000-(bigbox[3]-deltay)+1) # this is the line to be added to the box file
-	f.write(line+'\n')
+        print "line:", line
+        f.write(line+'\n')
 
-	#degrade code starts
-	strip=[deltax*.2,deltax*.4,deltax*.7]
-	for values in range(0,3):
-		distort2=inverted_image
-		for wai in range(0,deltay):
-			for ex in range(strip[values],strip[values]+1):
-				distort2.putpixel((ex,wai),255)
-		bigbox=(x,y,x+deltax,y+deltay)
-		#draw.rectangle(bigbox,None,10)
-		line=akshar+" "+str(bigbox[0]-1)+" "+str(2000-(bigbox[1]+deltay)-1)+" "+str(bigbox[2]+1)+" "+str(2000-(bigbox[3]-deltay)+1) # this is the line to be added to the box file
-        	f.write(line+'\n')
-		bigimage.paste(distort2,(x,y))
-		x=bigbox[2]+5
-        	if x>1950:
-            		x=10; y=y+40
-		
-			
-	#degrade code ends
-     
+        #degrade code starts
+        strip=[deltax*.2,deltax*.4,deltax*.7]
+        for values in range(0,3):
+            distort2=inverted_image
+            for wai in range(0,deltay):
+                for ex in range(int(strip[values]), int(strip[values]) + 1):
+                    distort2.putpixel((ex,wai),255)
+            bigbox=(x,y,x+deltax,y+deltay)
+            #draw.rectangle(bigbox,None,10)
+            line=akshar+" "+str(bigbox[0]-1)+" "+str(2000-(bigbox[1]+deltay)-1)+" "+str(bigbox[2]+1)+" "+str(2000-(bigbox[3]-deltay)+1) # this is the line to be added to the box file
+            f.write(line+'\n')
+            bigimage.paste(distort2,(x,y))
+            x=bigbox[2]+5
+            if x>1950:
+                    x=10; y=y+40
+        
+        #degrade code ends
         #distort.distort(filename2,bbox,fsz,akshar)
-     
-       
-       
-    bigimage.save(image_dir+"/"+"bigimage.tif","TIFF", dpi=(600,600))
+
+    bigimage.save(image_dir+"/"+ lang + "." + font_name + ".exp%2d.tif" % (font_size) ,"TIFF", dpi=(600,600))
     f.close()
        
            
@@ -164,13 +157,9 @@ else:
     print "Usage: python generate.py -font <font name> -l <language> -s <size> -a <input alphabet directory>"
     exit()
 
-font_string=font_name+" "+lang+" "+font_size
-
-
 #begin training    
-draw(font_string,int(font_size),lang,file.read_file(alphabet_dir))#reads all fonts in the directory font_dir and trains
+#reads all fonts in the directory font_dir and trains
+draw(font_name, int(font_size), lang, file.read_file(alphabet_dir))
 
-train.train(lang)
+train.train(lang, lang + "." + font_name + ".exp%2d" % (int(font_size)))
 #training ends
-
-
