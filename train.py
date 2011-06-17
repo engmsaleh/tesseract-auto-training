@@ -10,6 +10,7 @@ import glob
 import time
 import subprocess
 
+
 def find_tesseract():
     """Find best version of tesseract"""
     # TODO
@@ -27,9 +28,8 @@ def weedout(img_file_name, image_folder):
     else:
         os.mkdir("failure")
 
-    image = image_folder+img_file_name+'.tif'
-    boxfile = image_folder+img_file_name+'.box'
-
+    image = image_folder + img_file_name + '.tif'
+    boxfile = image_folder + img_file_name + '.box'
 
     shutil.move(image, "failure/")
     shutil.move(boxfile, "failure/")
@@ -41,7 +41,7 @@ def move_file(lang, filename):
     """Move filename to lang dir with lang prefix"""
     time.sleep(.09)
     # It is needed for windows - otherwise files are not removed...
-    
+
     target = lang + ".training_data/" + lang + "." + filename
 
     if os.path.exists(target):
@@ -130,11 +130,11 @@ def train(lang, filename):
     move_file(lang, "Microfeat")
     move_file(lang, "normproto")
 
-    # TODO: dictionary    
+    # TODO: dictionary
     # TODO: create lang.config with version info ;-)
 
     # Putting it all together
-    exec_string5 = "combine_tessdata " + lang + ".training_data/" + lang +"."
+    exec_string5 = "combine_tessdata " + lang + ".training_data/" + lang + "."
     print "Running: ", exec_string5
     output5 = subprocess.Popen(exec_string5, stdout=subprocess.PIPE, \
                              stderr=subprocess.STDOUT, \
