@@ -27,6 +27,8 @@ USAGE
 
 `python generate.py -font <font name> -l <language> -s <size> -a <input alphabet directory>`
 
+This generate testing images and run tesseract traning on it.
+
 **Example:**
 
     $ python generate.py -font mitra -l beng -s 10 -a beng.alphabet/

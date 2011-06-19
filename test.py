@@ -18,15 +18,18 @@ def main():
     pango_cntx = pangocairo.CairoContext(context)
 
     layout = pango_cntx.create_layout()
-    layout.set_font_description(pango.FontDescription('Lohit Bengali 10'))
-    layout.set_text("কুকুর হাহা কুকুর" + \
-        " হাহা কুকুর হাহা কুকুর " + \
-        "হাহা কুকুর হাহা কুকুর " + \
-        "হাহা কুকুর হাহা কুকুর " + \
-        "হাহা\n কি হল কি হল" + \
-        " কি হল কি হল কি হল কি" + \
-        " হল কি হল কি হল কি " + \
-        "হল কি হল কি হল কি হল কি হল")
+    layout.set_font_description(pango.FontDescription('Sans 15'))
+    layout.set_text("0 1 2 3 4 5 6 7 8 9 10\na A b B c C d D h H m M")
+    
+    #layout.set_font_description(pango.FontDescription('Lohit Bengali 10'))
+    # layout.set_text("কুকুর হাহা কুকুর" + \
+        # " হাহা কুকুর হাহা কুকুর " + \
+        # "হাহা কুকুর হাহা কুকুর " + \
+        # "হাহা কুকুর হাহা কুকুর " + \
+        # "হাহা\n কি হল কি হল" + \
+        # " কি হল কি হল কি হল কি" + \
+        # " হল কি হল কি হল কি " + \
+        # "হল কি হল কি হল কি হল কি হল")
 
     # Next four lines take care of centering the text. Feel free to ignore ;-)
     #width, height = surface.get_width(), surface.get_height()

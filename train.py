@@ -142,7 +142,17 @@ def train(lang, filename):
     print output5
 
     # Cleaning...
-#    if os.path.exists(filename + ".txt"):
-#        os.remove(filename + ".txt")
-#    if os.path.exists(filename + ".tr"):
-#        os.remove(filename + ".tr")
+    if os.path.exists(filename + ".txt"):
+        os.remove(filename + ".txt")
+    if os.path.exists(filename + ".tr"):
+        os.remove(filename + ".tr")
+
+
+def main():
+    """Main"""
+    #TODO: implement command line traning
+    #train(lang, filename)
+
+
+if __name__ == '__main__':
+    main()

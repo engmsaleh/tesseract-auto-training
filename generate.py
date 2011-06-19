@@ -38,6 +38,8 @@ def draw(font_name, font_size, lang, alphabets):
                 ".exp%2d.box" % (font_size)
     file_box = open(boxfile, "w")
 
+    # TODO: A4 = 2480x3508 with 300x300 DPI
+    # TODO: A5 format 1754x2480 with 300x300 DPI
     bigimage = Image.new("L", (2000, 2000), 255)
     x_val = y_val = 10
     count = 0
@@ -122,6 +124,10 @@ def draw(font_name, font_size, lang, alphabets):
                 y_val = y_val + 40
         # Degrade code ends
 
+    # TODO: multipage tiff maybe with:
+    #  - http://code.google.com/p/pylibtiff/
+    #  - http://freeimagepy.sourceforge.net/
+    #  - http://code.google.com/p/pylepthonica/
     bigimage.save(image_dir + "/" + lang + "." + font_name + \
                     ".exp%2d.tif" % font_size, "TIFF", dpi=(600, 600))
     file_box.close()
