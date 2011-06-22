@@ -99,7 +99,7 @@ def draw(font_name, font_size, lang, alphabets):
         line = akshar + " " + str(bigbox[0] - 1) + " " + \
                 str(2000 - (bigbox[1] + deltay) - 1) + " " + \
                 str(bigbox[2] + 1) + " " + str(2000 - (bigbox[3] - deltay) + 1)
-        print "line:", line
+        #print "line:", line
         file_box.write(line + '\n')
 
         # Degrade code starts

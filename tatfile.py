@@ -32,7 +32,6 @@ def combine(frest, fc_cont, fpresv, fpostsv):
 
 def read_file(alphabet_dir):
     """ Reads input alphabet files from alphabet_dir """
-    print "in file.py"
     # File containing vowels
     if(os.path.exists(alphabet_dir + "consonants")):
         file_cc = open(alphabet_dir + "consonants", 'r')

@@ -10,6 +10,7 @@ import glob
 import time
 import subprocess
 
+from datetime import datetime
 
 def find_tesseract():
     """Find best version of tesseract"""
@@ -17,6 +18,31 @@ def find_tesseract():
     highest_version = 'tesseract '
     return highest_version
 
+def put_version_info(lang, work_dir):
+    """Put version info to config file"""
+    inputfile = work_dir + lang + ".config"
+    if os.path.exists(inputfile):
+        newlines = []
+        version_info = False
+        fileconfig = open(inputfile, "r")
+        for line in fileconfig:
+            if '# VERSION:' in line:
+                newlines.append("# VERSION: %s\n" % str(datetime.today()))
+                version_info = True
+            else:
+                newlines.append(line)
+
+        if version_info == False:
+            newlines = "# VERSION: %s\n" % str(datetime.today()) + newlines
+
+        file_out = open(inputfile, "w")
+        for line in newlines:
+            file_out.write(line)
+        file_out.close()
+    else:
+        file_o = open(inputfile, "w")
+        file_o.write("# VERSION: " + str(datetime.today()))
+        file_o.close()
 
 def weedout(img_file_name, image_folder):
     """Move the corresponding erroneous image/box-file pair
@@ -131,8 +157,8 @@ def train(lang, filename):
     move_file(lang, "normproto")
 
     # TODO: dictionary
-    # TODO: create lang.config with version info ;-)
-
+    put_version_info(lang, lang + ".training_data/")
+    
     # Putting it all together
     exec_string5 = "combine_tessdata " + lang + ".training_data/" + lang + "."
     print "Running: ", exec_string5
