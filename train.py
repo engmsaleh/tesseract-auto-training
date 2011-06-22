@@ -16,8 +16,20 @@ from datetime import datetime
 def find_tesseract():
     """Find best version of tesseract"""
     # TODO
-    highest_version = 'tesseract '
-    return highest_version
+    prefix = ""
+    if os.path.exists("/usr/local/bin/tesseract"):
+        output = subprocess.Popen("/usr/local/bin/tesseract -v", \
+                    stdout=subprocess.PIPE, \
+                    stderr=subprocess.STDOUT, \
+                    shell=True).communicate()[0]
+        print output
+        if "tesseract-3.01" in output:
+            prefix = "/usr/local/bin/"
+            return prefix
+        elif ":Error:Usage:" in output:
+            print "Please install tesseract version >= 3.00!!!"
+            return None
+    return prefix
 
 def put_font_info(lang, search_font):
     """Put font info to font_properties file"""
@@ -29,8 +41,8 @@ def put_font_info(lang, search_font):
         fileconfig = open(inputfile, "r")
         for line in fileconfig:
             # find exact match
-            matchObj = re.match( r'^%s ' %(search_font), line, re.M)
-            if matchObj:
+            match_obj = re.match( r'^%s ' %(search_font), line, re.M)
+            if match_obj:
                 font_found = True
             if line.strip():
                 newlines.append(line)
@@ -44,9 +56,9 @@ def put_font_info(lang, search_font):
                 file_out.write(line)
             file_out.write('\n')
             file_out.close()
-            print "WARNING: Font entry for '%s' was added to file '%s' " + \ 
-                "with inicial data. Do not forget to review it!!!" \
-                % (search_font, inputfile)
+            print "WARNING: Font entry for '%s' was added"  % (search_font) + \
+                " to file '%s' with inicial data. Do not "  % (inputfile) + \
+                "forget to review it!!!"
     else:
         file_o = open(inputfile, "w")
         file_o.write("#%s <fontname> <italic> <bold> <fixed> <serif> " + \
@@ -54,8 +66,8 @@ def put_font_info(lang, search_font):
         file_o.write("timesitalic 1 0 0 1 0\n")
         file_o.write("%s 0 0 0 0 0\n\n" % search_font)
         file_o.close()
-        print "WARNING: There was created file '%s' with inicial font  " + \
-            "entry. Do not forget to review it!!!" % (inputfile)
+        print "WARNING: There was created file '%s' " % (inputfile) + \
+            "with inicial font entry. Do not forget to review it!!!"
 
 def put_version_info(lang, work_dir):
     """Put version info to config file"""
@@ -126,11 +138,14 @@ def train(lang, filename):
         pass
     else:
         os.mkdir(output_dir)
-   # os.chdir(output_dir)
+
     print "in train"
     image = filename + '.tif'
 
-    tesseract_cmd = find_tesseract()
+    prefix = find_tesseract()
+    if not (prefix):
+        exit()
+    tesseract_cmd = prefix + "tesseract "
     exec_string1 = tesseract_cmd + input_dir + image + ' ' + filename + \
                     ' nobatch box.train.stderr'
 
@@ -150,7 +165,7 @@ def train(lang, filename):
         print errors_string
 
     # Compute the Character Set
-    exec_string2 = "unicharset_extractor"
+    exec_string2 = prefix + "unicharset_extractor"
     for name in glob.glob(input_dir + '/*.box'):
         exec_string2 += " " + name
 
@@ -168,9 +183,10 @@ def train(lang, filename):
     for tr_file in glob.glob('*.tr'):
         tr_string += tr_string + " " + tr_file
 
-    exec_string3 = "mftraining -F %s -U unicharset" % (lang + ".training_data/" + lang + ".font_properties")
+    exec_string3 = prefix + "mftraining -F %s -U unicharset" % (lang + \
+        ".training_data/" + lang + ".font_properties") + tr_string
     #exec_string3 = "mftraining -U unicharset " + tr_string
-    exec_string4 = "cntraining " + tr_string
+    exec_string4 = prefix + "cntraining " + tr_string
 
     print "Running3: ", exec_string3
     output3 = subprocess.Popen(exec_string3, stdout=subprocess.PIPE, \
@@ -199,7 +215,8 @@ def train(lang, filename):
     put_version_info(lang, lang + ".training_data/")
     
     # Putting it all together
-    exec_string5 = "combine_tessdata " + lang + ".training_data/" + lang + "."
+    exec_string5 = prefix + "combine_tessdata " + lang + ".training_data/" + \
+                    lang + "."
     print "Running: ", exec_string5
     output5 = subprocess.Popen(exec_string5, stdout=subprocess.PIPE, \
                              stderr=subprocess.STDOUT, \
