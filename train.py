@@ -5,6 +5,7 @@ This is python module for tesseract training process
 """
 
 import os
+import re
 import shutil
 import glob
 import time
@@ -17,6 +18,44 @@ def find_tesseract():
     # TODO
     highest_version = 'tesseract '
     return highest_version
+
+def put_font_info(lang, search_font):
+    """Put font info to font_properties file"""
+    inputfile = lang + ".training_data/" + lang + ".font_properties"
+
+    if os.path.exists(inputfile):
+        newlines = []
+        font_found = False
+        fileconfig = open(inputfile, "r")
+        for line in fileconfig:
+            # find exact match
+            matchObj = re.match( r'^%s ' %(search_font), line, re.M)
+            if matchObj:
+                font_found = True
+            if line.strip():
+                newlines.append(line)
+
+        # TODO: get font info
+        
+        if font_found == False:
+            newlines.append("%s 0 0 0 0 0\n" % search_font)
+            file_out = open(inputfile, "w")
+            for line in newlines:
+                file_out.write(line)
+            file_out.write('\n')
+            file_out.close()
+            print "WARNING: Font entry for '%s' was added to file '%s' " + \ 
+                "with inicial data. Do not forget to review it!!!" \
+                % (search_font, inputfile)
+    else:
+        file_o = open(inputfile, "w")
+        file_o.write("#%s <fontname> <italic> <bold> <fixed> <serif> " + \
+            "<fraktur>\n")
+        file_o.write("timesitalic 1 0 0 1 0\n")
+        file_o.write("%s 0 0 0 0 0\n\n" % search_font)
+        file_o.close()
+        print "WARNING: There was created file '%s' with inicial font  " + \
+            "entry. Do not forget to review it!!!" % (inputfile)
 
 def put_version_info(lang, work_dir):
     """Put version info to config file"""
@@ -122,15 +161,15 @@ def train(lang, filename):
     # this creates files: unicharset
     print output2
 
-    # TODO: font_properties (new in 3.01)
-
+    put_font_info(lang, filename.split('.')[1])
+    
     # Clustering
     tr_string = ""
     for tr_file in glob.glob('*.tr'):
         tr_string += tr_string + " " + tr_file
 
-    #exec_string3="mftraining -F font_properties -U unicharset"
-    exec_string3 = "mftraining -U unicharset " + tr_string
+    exec_string3 = "mftraining -F %s -U unicharset" % (lang + ".training_data/" + lang + ".font_properties")
+    #exec_string3 = "mftraining -U unicharset " + tr_string
     exec_string4 = "cntraining " + tr_string
 
     print "Running3: ", exec_string3
