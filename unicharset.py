@@ -196,25 +196,32 @@ def find_script_name(u_c):
 def correct_unicharset(inputfile):
     """ Open unicharset data file and correct script name"""
     filein = codecs.open(inputfile, encoding='utf-8')
-    newlines = []
-    unknown = ""
+    newlines = ""
     for line in filein:
         data = line.strip().split(' ')
         if (len(data) == 4):  # 3.00 version
             if (data[2] == "NULL"):
                 try:
                     script_name = find_script_name(data[0])
-                    newlines.append("%s %s %s %s\n" % (data[0], data[1], \
-                                    script_name, data[3]))
+                    newlines += "%s %s %s %s\n" % (data[0], data[1], \
+                                    script_name, data[3])
                 except KeyError:
                     # print u"%s is not in the list." % (sys.exc_value)
-                    newlines.append(line)
+                    newlines += line 
+        elif (len(data) >= 8):   # 3.01 version?
+            if (data[3] == "NULL"):
+                try:
+                    data[3] = find_script_name(data[0])
+                except KeyError:
+                    pass
+            for i in range(len(data)):
+                newlines += "%s " % data[i]
+            newlines = newlines[:-1] + "\n"
         else:
-            newlines.append(line)
+            newlines += line 
     filein.close()
 
     file_o = codecs.open(inputfile, encoding='utf-8', mode='w+')
     for line in newlines:
         file_o.write(line)
-    file_o.write(unknown)
     file_o.close()
