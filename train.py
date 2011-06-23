@@ -13,9 +13,20 @@ import subprocess
 
 from datetime import datetime
 
+import unicharset
+
 def find_tesseract():
     """Find best version of tesseract"""
     # TODO
+    # tesseract -v produce on linux:
+    # version 3.01: "tesseract-3.01"
+    # version 3.00:
+    # version 2.0x:
+    # tesseract -v produce on window:
+    # version 3.01: "tesseract-3.01"
+    # version 3.00: "Usage:tesseract imagename outputbase [-l lang] [configfile [[+|-]varfile]...]"
+    # version 2.0x:
+    
     prefix = ""
     if os.path.exists("/usr/local/bin/tesseract"):
         output = subprocess.Popen("/usr/local/bin/tesseract -v", \
@@ -38,14 +49,15 @@ def put_font_info(lang, search_font):
     if os.path.exists(inputfile):
         newlines = []
         font_found = False
-        fileconfig = open(inputfile, "r")
-        for line in fileconfig:
+        filein = open(inputfile, "r")
+        for line in filein:
             # find exact match
             match_obj = re.match( r'^%s ' %(search_font), line, re.M)
             if match_obj:
                 font_found = True
             if line.strip():
                 newlines.append(line)
+        filein.close()
 
         # TODO: get font info
         
@@ -82,6 +94,7 @@ def put_version_info(lang, work_dir):
                 version_info = True
             else:
                 newlines.append(line)
+        fileconfig.close()
 
         if version_info == False:
             newlines = "# VERSION: %s\n" % str(datetime.today()) + newlines
@@ -143,7 +156,7 @@ def train(lang, filename):
     image = filename + '.tif'
 
     prefix = find_tesseract()
-    if not (prefix):
+    if prefix == None:
         exit()
     tesseract_cmd = prefix + "tesseract "
     exec_string1 = tesseract_cmd + input_dir + image + ' ' + filename + \
@@ -165,6 +178,7 @@ def train(lang, filename):
         print errors_string
 
     # Compute the Character Set
+    # TODO: unicharset_extractor -D lang.dir/
     exec_string2 = prefix + "unicharset_extractor"
     for name in glob.glob(input_dir + '/*.box'):
         exec_string2 += " " + name
@@ -175,6 +189,8 @@ def train(lang, filename):
                              shell=True).communicate()[0]
     # this creates files: unicharset
     print output2
+    # TODO correct script in unicharset file
+    unicharset.correct_unicharset("./unicharset")
 
     put_font_info(lang, filename.split('.')[1])
     
@@ -193,7 +209,7 @@ def train(lang, filename):
                              stderr=subprocess.STDOUT, \
                              shell=True).communicate()[0]
     # this creates files: inttemp, mfunicharset, pffmtable, Microfeat
-    # TODO: there is on output on Windows with tesseract 3.00
+    # TODO: there is no output on Windows with tesseract 3.00
     print output3
 
     print "Running: ", exec_string4
