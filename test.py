@@ -18,8 +18,9 @@ def main():
     pango_cntx = pangocairo.CairoContext(context)
 
     layout = pango_cntx.create_layout()
-    layout.set_font_description(pango.FontDescription('Sans 15'))
-    layout.set_text("0 1 2 3 4 5 6 7 8 9 10\na A b B c C d D h H m M")
+    layout.set_font_description(pango.FontDescription('Liberation Serif 15'))
+    layout.set_text(" This flag fits to fine art impression.\n\n Liberation Serif 15\n Test text for QT Box Editor")
+    #layout.set_text("0 1 2 3 4 5 6 7 8 9 10\na A b B c C d D h H m M")
     
     #layout.set_font_description(pango.FontDescription('Lohit Bengali 10'))
     # layout.set_text("কুকুর হাহা কুকুর" + \
